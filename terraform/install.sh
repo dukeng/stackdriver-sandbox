@@ -95,7 +95,7 @@ getExternalIp() {
 # Install Load Generator service and start generating synthetic traffic to Sandbox
 loadGen() {
   log "Running load generator"
-  ../loadgenerator/loadgenerator-tool autostart $external_ip
+  ../loadgenerator/loadgen autostart $external_ip
   # find the IP of the load generator web interface
   TRIES=0
   while [[ $(curl -sL -w "%{http_code}"  "http://$loadgen_ip:8080" -o /dev/null --max-time 1) -ne 200  && \
@@ -113,9 +113,10 @@ loadGen() {
 }
 
 displaySuccessMessage() {
-    gcp_path="https://console.cloud.google.com/kubernetes/workload"
+    gcp_path="https://console.cloud.google.com"
     if [[ -n "${created_project}" ]]; then
-        gcp_path="$gcp_path?project=$created_project"
+        gcp_kubernetes_path="$gcp_path/kubernetes/workload?project=$created_project"
+        gcp_monitoring_path="$gcp_path/monitoring?project=$created_project"
     fi
 
     if [[ -n "${loadgen_ip}" ]]; then
@@ -128,8 +129,8 @@ displaySuccessMessage() {
     log "********************************************************************************"
     log "Stackdriver Sandbox deployed successfully!"
     log ""
-    log "     Stackdriver Dashboard: https://app.google.stackdriver.com/accounts/create"
-    log "     Google Cloud Console Dashboard: $gcp_path"
+    log "     Google Cloud Console KBE Dashboard: $gcp_kubernetes_path"
+    log "     Google Cloud Console Monitoring Workspace: $gcp_monitoring_path"
     log "     Hipstershop web app address: http://$external_ip"
     log "     Load generator web interface: $loadgen_addr"
     log "********************************************************************************"
